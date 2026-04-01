@@ -1,8 +1,8 @@
-const { verifyToken } = require("../utils/jwt");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 const AppError = require("../utils/AppError");
 
-// 🔐 Protect route
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   let token;
 
   if (
@@ -13,27 +13,38 @@ const protect = (req, res, next) => {
   }
 
   if (!token) {
-    return next(new AppError("Not authorized", 401));
+    return next(new AppError("Not authorized to access this route", 401));
   }
 
-  const decoded = verifyToken(token);
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
 
-  if (!decoded) {
-    return next(new AppError("Invalid or expired token", 401));
+    if (!user) {
+      return next(new AppError("Not authorized to access this route", 401));
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    return next(new AppError("Not authorized to access this route", 401));
   }
-
-  req.user = decoded; // { id, role }
-  next();
 };
 
-// 🔑 Role-based access
 const authorize = (...roles) => {
   return (req, res, next) => {
+    if (!req.user) {
+      return next(new AppError("Token missing or invalid", 401));
+    }
+
     if (!roles.includes(req.user.role)) {
-      return next(new AppError("Forbidden", 403));
+      return next(new AppError(`User role ${req.user.role} is not authorized to access this route`, 403));
     }
     next();
   };
 };
 
-module.exports = { protect, authorize };
+module.exports = {
+  protect,
+  authorize,
+};
