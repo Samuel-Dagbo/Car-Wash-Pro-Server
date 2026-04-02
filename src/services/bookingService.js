@@ -194,6 +194,36 @@ const getBookingsByStatus = async (status) => {
     return bookings;
 };
 
+const getBookingsByUser = async (userId, filters = {}) => {
+    const query = { customer: userId };
+
+    if (filters.status) {
+        if (!ALL_BOOKING_STATUSES.includes(filters.status)) {
+            throw new AppError("Invalid booking status", 400);
+        }
+        query.status = filters.status;
+    }
+
+    if (filters.date) {
+        const parsedDate = new Date(filters.date);
+        if (Number.isNaN(parsedDate.getTime())) {
+            throw new AppError("Invalid booking date", 400);
+        }
+
+        const startOfDay = new Date(parsedDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(parsedDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        query.date = { $gte: startOfDay, $lte: endOfDay };
+    }
+
+    const bookings = await Booking.find(query)
+        .populate("service")
+        .sort({ createdAt: -1 });
+
+    return bookings;
+};
+
 
 
 
@@ -205,5 +235,6 @@ module.exports = {
     updateBooking,
     deleteBooking,
     getBookingsByDate,
-    getBookingsByStatus
+    getBookingsByStatus,
+    getBookingsByUser
 };

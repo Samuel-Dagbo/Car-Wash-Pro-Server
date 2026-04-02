@@ -14,9 +14,10 @@ app.get("/api/health", (req, res) => {
 });
 
 // Routes (uncomment when ready)
-// app.use("/api/auth", require("./routes/authRoute"));
-// app.use("/api/services", require("./routes/serviceRoute"));
-// app.use("/api/bookings", require("./routes/bookingRoute"));
+app.use("/api/auth", require("./routes/authRoute"));
+app.use("/api/services", require("./routes/serviceRoute"));
+app.use("/api/bookings", require("./routes/bookingRoute"));
+app.use("/api/dashboard", require("./routes/dashboardRoute"));
 
 // Error handler (must be last)
 app.use(errorHandler);
