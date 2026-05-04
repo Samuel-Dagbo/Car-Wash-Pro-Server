@@ -72,7 +72,7 @@ function startSelfPing() {
 async function startServer() {
   await connectDB();
   await seedServicesIfEmpty();
-  await seedAdminIfEmpty();
+  await seedAdminIfEmpty(); 
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
@@ -80,4 +80,7 @@ async function startServer() {
   });
 }
 
-startServer();
+startServer().catch((err) => {
+  console.error("Server failed to start:", err);
+  process.exit(1);
+});

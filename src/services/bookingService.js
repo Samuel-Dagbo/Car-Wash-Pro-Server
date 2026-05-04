@@ -68,7 +68,7 @@ const createBooking = async(data) => {
 const getAllBookings = async() => {
     const bookings = await Booking
     .find()
-    .populate("service")
+    .populate("service", "-imageData -imageMimeType")
     .sort({createdAt: -1});
 
     return bookings;
@@ -77,7 +77,7 @@ const getAllBookings = async() => {
 const getBookingById = async(id) => {
     const booking = await Booking
     .findById(id)
-    .populate("service");
+    .populate("service", "-imageData -imageMimeType");
 
     if(!booking){
         throw new AppError("Booking not found", 404);
@@ -175,7 +175,7 @@ const getBookingsByDate = async (date) => {
     const bookings = await Booking.find({
         date: { $gte: startOfDay, $lte: endOfDay },
         status: { $in: ACTIVE_BOOKING_STATUSES }
-    }).populate("service");
+    }).populate("service", "-imageData -imageMimeType");
 
     return bookings;
 };
@@ -189,7 +189,7 @@ const getBookingsByStatus = async (status) => {
 
     const bookings = await Booking.find({
         status: status
-    }).populate("service");
+    }).populate("service", "-imageData -imageMimeType");
 
     return bookings;
 };
@@ -218,7 +218,7 @@ const getBookingsByUser = async (userId, filters = {}) => {
     }
 
     const bookings = await Booking.find(query)
-        .populate("service")
+        .populate("service", "-imageData -imageMimeType")
         .sort({ createdAt: -1 });
 
     return bookings;

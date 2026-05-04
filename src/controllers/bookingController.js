@@ -15,6 +15,9 @@ const createBookingHandler = asyncHandler(async(req,res) => {
     const booking = await createBooking({
         ...req.body,
         customer: req.user?.id,
+        customerName: req.user?.name || req.body.customerName,
+        customerContact: req.user?.contact || req.body.customerContact || req.body.customerPhone,
+        customerEmail: req.user?.email || req.body.customerEmail,
     });
     res.status(201).json({ success: true, data: booking });
 });

@@ -7,14 +7,19 @@ const createService = async (data) => {
 };
 
 const getAllServices = async () => {
-    const service =  await Service.find();
+    const service = await Service.find()
+        .select("-imageData -imageMimeType");
     return service;
 };
+
 const getServiceById = async (id) => {
-    const service = await Service.findById(id);
-    if(!service){
+    const service = await Service.findById(id)
+        .select("-imageData -imageMimeType");
+
+    if (!service) {
         throw new AppError("Service not found", 404);
     }
+
     return service;
 };
 const updateService = async (id,data) => {

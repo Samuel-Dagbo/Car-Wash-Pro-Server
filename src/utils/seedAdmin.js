@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const User = require("../models/User");
 
 const defaultAdmin = {
@@ -11,9 +11,34 @@ const defaultAdmin = {
 
 async function seedAdminIfEmpty() {
   try {
+    const existingDefaultAdmin = await User.findOne({
+      role: "admin",
+      email: defaultAdmin.email,
+    });
+
+    if (existingDefaultAdmin) {
+      const storedPassword = existingDefaultAdmin.password;
+      const hasValidStoredPassword =
+        typeof storedPassword === "string" && storedPassword.trim().length > 0;
+
+      const passwordMatches = hasValidStoredPassword
+        ? await bcrypt.compare(defaultAdmin.password, storedPassword)
+        : false;
+
+      if (!passwordMatches) {
+        existingDefaultAdmin.password = defaultAdmin.password;
+        await existingDefaultAdmin.save();
+        console.log("Default admin password repaired");
+      } else {
+        console.log("Admin user already exists, skipping seed");
+      }
+
+      return;
+    }
+
     const existingAdmin = await User.findOne({ role: "admin" });
     if (existingAdmin) {
-      console.log("Admin user already exists, skipping seed");
+      console.log("An admin user already exists, skipping default admin seed");
       return;
     }
 
