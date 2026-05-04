@@ -18,6 +18,7 @@ const createBookingHandler = asyncHandler(async(req,res) => {
         customerName: req.user?.name || req.body.customerName,
         customerContact: req.user?.contact || req.body.customerContact || req.body.customerPhone,
         customerEmail: req.user?.email || req.body.customerEmail,
+        vehicleImageUrl: req.body.vehicleImageUrl,
     });
     res.status(201).json({ success: true, data: booking });
 });
@@ -76,7 +77,16 @@ const updateBookingHandler = asyncHandler(async(req,res)=> {
         throw new AppError("You are not authorized to update this booking", 403);
     }
 
-    const updatedBooking = await updateBooking(id,req.body);
+    const updatePayload = {
+        ...req.body,
+        vehicleImageUrl: req.body.vehicleImageUrl,
+    };
+
+    if (String(req.body.clearVehicleImage).toLowerCase() === "true") {
+        updatePayload.vehicleImageUrl = null;
+    }
+
+    const updatedBooking = await updateBooking(id, updatePayload);
     res.status(200).json({
             status: "success",
             data: updatedBooking

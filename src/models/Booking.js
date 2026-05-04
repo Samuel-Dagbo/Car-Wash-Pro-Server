@@ -34,6 +34,7 @@ const bookingSchema = new mongoose.Schema({
   vehicleMake: { type: String, trim: true },
   vehicleModel: { type: String, trim: true },
   vehiclePlate: { type: String, trim: true },
+  vehicleImageUrl: { type: String, trim: true },
   notes: { type: String, trim: true },
 
   cancelledAt: { type: Date },

@@ -60,6 +60,7 @@ const createBooking = async(data) => {
         vehicleMake: data.vehicleMake,
         vehicleModel: data.vehicleModel,
         vehiclePlate: data.vehiclePlate,
+        vehicleImageUrl: data.vehicleImageUrl,
         totalAmount: service.price,
         status: data.status && ALL_BOOKING_STATUSES.includes(data.status) ? data.status : "Pending"
     });
